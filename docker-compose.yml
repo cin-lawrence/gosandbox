@@ -1,0 +1,74 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./build/api/Dockerfile.dev
+    container_name: api
+    env_file:
+      - ./configs/api/.env
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+      - queue
+      - redis
+
+    # wkrgo:
+  wkrce:
+    build:
+      context: .
+      dockerfile: ./build/wkrce/Dockerfile
+    command: celery -A worker worker -l INFO -Q celery
+    env_file:
+      - ./configs/wkrce/.env
+    depends_on:
+      - db
+      - queue
+      - redis
+
+  db:
+    image: postgres:13
+    env_file:
+      - ./configs/postgres/.env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "5050:5050"
+    env_file:
+      - ./configs/pgadmin/.env
+
+  queue:
+    image: rabbitmq:3.9
+    env_file:
+      - ./configs/rabbitmq/.env
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+        - 5672:5672
+
+  redis:
+    image: redis:6-alpine
+
+volumes:
+  db-data:
+    name: db-data
