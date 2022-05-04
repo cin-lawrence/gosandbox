@@ -1,15 +1,15 @@
 package worker
 
 import (
-        "encoding/json"
-        "time"
+	"encoding/json"
+	"time"
 
+	gc "github.com/gocelery/gocelery"
 	"github.com/streadway/amqp"
-        gc "github.com/gocelery/gocelery"
 )
 
 type AMQPCeleryBroker struct {
-        *gc.AMQPCeleryBroker
+	*gc.AMQPCeleryBroker
 }
 
 func (b *AMQPCeleryBroker) SendCeleryMessage(message *gc.CeleryMessage) error {
@@ -61,24 +61,24 @@ func (b *AMQPCeleryBroker) SendCeleryMessage(message *gc.CeleryMessage) error {
 }
 
 func NewAMQPCeleryBroker(host string) *AMQPCeleryBroker {
-        conn, channel := gc.NewAMQPConnection(host)
+	conn, channel := gc.NewAMQPConnection(host)
 	broker := &AMQPCeleryBroker{
-                &gc.AMQPCeleryBroker{
-                        Channel:    channel,
-                        Connection: conn,
-                        Exchange:   &gc.AMQPExchange{
-                                Name: "default",
-                                Type: "direct",
-                                Durable: true,
-                                AutoDelete: false,
-                        },
-                        Queue:      &gc.AMQPQueue{
-                                Name: "celery",
-                                Durable: true,
-                                AutoDelete: false,
-                        },
-                        Rate:   1,
-                },
+		&gc.AMQPCeleryBroker{
+			Channel:    channel,
+			Connection: conn,
+			Exchange: &gc.AMQPExchange{
+				Name:       "default",
+				Type:       "direct",
+				Durable:    true,
+				AutoDelete: false,
+			},
+			Queue: &gc.AMQPQueue{
+				Name:       "celery",
+				Durable:    true,
+				AutoDelete: false,
+			},
+			Rate: 1,
+		},
 	}
 	if err := broker.CreateExchange(); err != nil {
 		panic(err)

@@ -7,79 +7,79 @@ import (
 )
 
 type JobService struct {
-        *EntityService
+	*EntityService
 }
 
 func NewJobService() *JobService {
-        srv := &JobService{
-                &EntityService{db: db.DB.Preload("User")},
-        }
-        db.DB.Exec(models.CREATE_ENUM_JOB_STATUS)
-        db.DB.AutoMigrate(&models.Job{})
+	srv := &JobService{
+		&EntityService{db: db.DB.Preload("User")},
+	}
+	db.DB.Exec(models.CREATE_ENUM_JOB_STATUS)
+	db.DB.AutoMigrate(&models.Job{})
 
-        return srv
+	return srv
 }
 
 func (srv *JobService) List() ([]models.Job, error) {
-        var models []models.Job
-        session := srv.newSession()
-        result := session.Find(&models)
-        if result.Error != nil {
-                log.Error("List models failed")
-                return nil, result.Error
-        }
-        return models, nil
+	var models []models.Job
+	session := srv.newSession()
+	result := session.Find(&models)
+	if result.Error != nil {
+		log.Error("List models failed")
+		return nil, result.Error
+	}
+	return models, nil
 }
 
 func (srv *JobService) Create(model models.Job) (models.Job, error) {
-        session := srv.newSession()
-        result := session.Create(&model)
-        if result.Error != nil {
-                log.Errorf("Create job failed: %v", result.Error)
-                return models.Job{}, result.Error
-        }
+	session := srv.newSession()
+	result := session.Create(&model)
+	if result.Error != nil {
+		log.Errorf("Create job failed: %v", result.Error)
+		return models.Job{}, result.Error
+	}
 
-        session.First(&model, model.ID)
-        return model, nil
+	session.First(&model, model.ID)
+	return model, nil
 }
 
 func (srv *JobService) Get(id string) (models.Job, error) {
-        var model models.Job
-        session := srv.newSession()
-        result := session.First(&model, id)
-        if result.Error != nil {
-                log.Errorf("Get job %s failed: %v", id, result.Error)
-                return models.Job{}, result.Error
-        }
-        return model, nil
+	var model models.Job
+	session := srv.newSession()
+	result := session.First(&model, id)
+	if result.Error != nil {
+		log.Errorf("Get job %s failed: %v", id, result.Error)
+		return models.Job{}, result.Error
+	}
+	return model, nil
 }
 
 func (srv *JobService) Update(id string, model models.Job) (models.Job, error) {
-        modelInDB, err := srv.Get(id)
-        if err != nil {
-                log.Errorf("Job %s not found: %v", id, err)
-                return models.Job{}, err
-        }
-        session := srv.newSession()
-        result := session.Model(&modelInDB).Updates(model)
-        if result.Error != nil {
-                log.Errorf("Update job % failed: %v", id, result.Error)
-                return models.Job{}, result.Error
-        }
-        return modelInDB, nil
+	modelInDB, err := srv.Get(id)
+	if err != nil {
+		log.Errorf("Job %s not found: %v", id, err)
+		return models.Job{}, err
+	}
+	session := srv.newSession()
+	result := session.Model(&modelInDB).Updates(model)
+	if result.Error != nil {
+		log.Errorf("Update job % failed: %v", id, result.Error)
+		return models.Job{}, result.Error
+	}
+	return modelInDB, nil
 }
 
 func (srv *JobService) Delete(id string) error {
-        modelInDB, err := srv.Get(id)
-        if err != nil {
-                log.Errorf("Job %s not found: %v",  id, err)
-                return err
-        }
-        session := srv.newSession()
-        result := session.Delete(&modelInDB)
-        if result.Error != nil {
-                log.Errorf("Delete job %s failed: %v", id, result.Error)
-                return result.Error
-        }
-        return nil
+	modelInDB, err := srv.Get(id)
+	if err != nil {
+		log.Errorf("Job %s not found: %v", id, err)
+		return err
+	}
+	session := srv.newSession()
+	result := session.Delete(&modelInDB)
+	if result.Error != nil {
+		log.Errorf("Delete job %s failed: %v", id, result.Error)
+		return result.Error
+	}
+	return nil
 }

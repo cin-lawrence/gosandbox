@@ -1,13 +1,13 @@
 package log
 
 import (
-        "os"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
-        log.SetFormatter(&log.JSONFormatter{})
-        log.SetOutput(os.Stdout)
-        log.SetLevel(log.WarnLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.WarnLevel)
 }

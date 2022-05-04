@@ -1,19 +1,19 @@
 package main
 
 import (
-        "os"
+	"os"
 
-        "github.com/cin-lawrence/gosandbox/pkg/api"
+	"github.com/cin-lawrence/gosandbox/pkg/api"
 )
 
 func getEnv(key, fallback string) string {
-        if value, ok := os.LookupEnv(key); ok {
-                return value
-        }
-        return fallback
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
 func main() {
-        server := api.NewAPIServer()
-        server.Run("0.0.0.0", 8080)
+	server := api.NewAPIServer()
+	server.Run("0.0.0.0", 8080)
 }

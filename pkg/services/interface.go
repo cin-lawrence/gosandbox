@@ -8,13 +8,12 @@ import (
 )
 
 type EntityService struct {
-        db *gorm.DB
+	db *gorm.DB
 }
 
-
 func (srv *EntityService) newSession() *gorm.DB {
-        ctx, _ := context.WithTimeout(context.Background(), time.Second)
-        session := srv.db.WithContext(ctx)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second)
+	session := srv.db.WithContext(ctx)
 
-        return session
+	return session
 }

@@ -1,31 +1,31 @@
 package db
 
 import (
-        "errors"
-        "strings"
+	"errors"
+	"strings"
 
-        "github.com/cin-lawrence/gosandbox/pkg/config"
+	"github.com/cin-lawrence/gosandbox/pkg/config"
 	log "github.com/sirupsen/logrus"
-        "gorm.io/gorm"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB = ConnectToDatabase()
 
 func ConnectToDatabase() *gorm.DB {
-        var dbConn *gorm.DB
-        var err error
+	var dbConn *gorm.DB
+	var err error
 
-        switch {
-        case strings.HasPrefix(config.Config.DatabaseURI, "postgresql://"):
-                dbConn, err = ConnectToPostgres(config.Config.DatabaseURI)
-        default:
-                err = errors.New("Unsupported DB URI")
-        }
+	switch {
+	case strings.HasPrefix(config.Config.DatabaseURI, "postgresql://"):
+		dbConn, err = ConnectToPostgres(config.Config.DatabaseURI)
+	default:
+		err = errors.New("Unsupported DB URI")
+	}
 
-        if err != nil {
-                log.Fatal("Failed to connect database")
-                panic(err)
-        }
+	if err != nil {
+		log.Fatal("Failed to connect database")
+		panic(err)
+	}
 
-        return dbConn
+	return dbConn
 }
