@@ -6,7 +6,6 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY ./cmd/api/ ./cmd/api/
 COPY ./pkg/api/ ./pkg/api/
-COPY ./docs ./docs
 COPY ./configs/api/ ./docs/api/
 
 RUN go install github.com/cosmtrek/air@latest
