@@ -8,6 +8,7 @@ import (
         "github.com/cin-lawrence/gosandbox/pkg/services"
 
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 )
 
 var authService *services.AuthService = services.NewAuthService()
@@ -35,4 +36,29 @@ func Authorize() gin.HandlerFunc {
                 ctx.Next()
         }
 
+}
+
+func CORS() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost")
+		ctx.Writer.Header().Set("Access-Control-Max-Age", "86400")
+		ctx.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
+		ctx.Writer.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, x-access-token")
+		ctx.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
+		ctx.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if ctx.Request.Method == "OPTIONS" {
+			ctx.AbortWithStatus(200)
+		} else {
+			ctx.Next()
+		}
+	}
+}
+
+func GenerateRequestID() gin.HandlerFunc {
+        return func(ctx *gin.Context) {
+                requestID := uuid.Must(uuid.NewV4())
+                ctx.Writer.Header().Set("X-Request-Id", requestID.String())
+                ctx.Next()
+        }
 }

@@ -4,7 +4,9 @@ go 1.18
 
 require (
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
+	github.com/gin-contrib/gzip v0.0.5
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gocelery/gocelery v0.0.0-20201111034804-825d89059344
 	github.com/golang-jwt/jwt/v4 v4.4.1
@@ -25,7 +27,6 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
