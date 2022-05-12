@@ -32,7 +32,7 @@ func NewV1JobGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 		WorkerClient: worker.NewWorkerClient(),
 	}
 
-	v1JobGroup := rg.Group("/jobs")
+	v1JobGroup := rg.Group("/jobs", Authorize())
 	v1JobGroup.GET("/", v1JobAPI.ListJobs)
 	v1JobGroup.POST("/", v1JobAPI.CreateJob)
 	v1JobGroup.GET("/:id", v1JobAPI.GetJob)
