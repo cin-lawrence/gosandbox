@@ -23,14 +23,6 @@ type V1JobAPI struct {
 	WorkerClient *gc.CeleryClient
 }
 
-type JobList struct {
-	Items []models.Job `json:"items"`
-}
-
-type JobInput struct {
-	UserID uint `json:"user_id" binding:"required"`
-}
-
 var v1JobAPI *V1JobAPI
 
 func NewV1JobGroup(rg *gin.RouterGroup) *gin.RouterGroup {
@@ -55,7 +47,7 @@ func (api *V1JobAPI) ListJobs(ctx *gin.Context) {
 		v1.SendError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, JobList{Items: jobs})
+	ctx.JSON(http.StatusOK, models.JobList{Items: jobs})
 }
 
 func (api *V1JobAPI) CreateJob(ctx *gin.Context) {

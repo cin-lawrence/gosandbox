@@ -13,15 +13,6 @@ type V1UserAPI struct {
 	UserService services.UserService
 }
 
-type UserList struct {
-	Items []models.User `json:"items"`
-}
-
-type UserInput struct {
-	Name  string `json:"name" binding:"required"`
-	Email string `json:"email" binding:"required"`
-}
-
 var v1UserAPI *V1UserAPI
 
 func NewV1UserGroup(rg *gin.RouterGroup) *gin.RouterGroup {
@@ -29,7 +20,7 @@ func NewV1UserGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 		UserService: *services.NewUserService(),
 	}
 
-	v1UserGroup := rg.Group("/users")
+	v1UserGroup := rg.Group("/users", Authorize())
 	v1UserGroup.GET("/", v1UserAPI.ListUsers)
 	v1UserGroup.POST("/", v1UserAPI.CreateUser)
 	v1UserGroup.GET("/:id", v1UserAPI.GetUser)
@@ -45,17 +36,17 @@ func (api *V1UserAPI) ListUsers(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, UserList{Items: users})
+	ctx.JSON(http.StatusOK, models.UserList{Items: users})
 }
 
 func (api *V1UserAPI) CreateUser(ctx *gin.Context) {
-	var user models.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
-		v1.SendError(ctx, http.StatusBadRequest, err)
+	var userInput models.UserInput
+	if err := ctx.ShouldBind(&userInput); err != nil {
+		v1.SendError(ctx, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	user, err := api.UserService.Create(user)
+	user, err := api.UserService.Create(userInput)
 	if err != nil {
 		v1.SendError(ctx, http.StatusBadRequest, err)
 		return
