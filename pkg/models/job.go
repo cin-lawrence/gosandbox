@@ -36,3 +36,7 @@ type Job struct {
 	UserID uint           `json:"user_id" binding:"required"`
 	User   *User          `json:"user"`
 }
+
+type JobList struct {
+	Items []Job `json:"items"`
+}
