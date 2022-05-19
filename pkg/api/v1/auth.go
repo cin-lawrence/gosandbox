@@ -1,14 +1,15 @@
 package v1
 
 import (
-        "fmt"
 	"errors"
+	"fmt"
 	"net/http"
-        "strconv"
+	"strconv"
 
 	"github.com/cin-lawrence/gosandbox/pkg/api/error"
 	"github.com/cin-lawrence/gosandbox/pkg/models"
 	"github.com/cin-lawrence/gosandbox/pkg/services"
+	"github.com/cin-lawrence/gosandbox/pkg/validator"
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v4"
@@ -17,6 +18,7 @@ import (
 type V1AuthAPI struct {
         AuthService services.AuthService
         UserService services.UserService
+        Validator *validator.UserValidator
 }
 
 var v1AuthAPI *V1AuthAPI
@@ -25,6 +27,7 @@ func NewV1AuthGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 	v1AuthAPI = &V1AuthAPI{
                 AuthService: *services.NewAuthService(),
 		UserService: *services.NewUserService(),
+                Validator: new(validator.UserValidator),
 	}
 
 	v1AuthGroup := rg.Group("/auth")
@@ -94,7 +97,8 @@ func (api *V1AuthAPI) Login(ctx *gin.Context) {
         var userLogin models.UserLogin
 
         if err := ctx.ShouldBind(&userLogin); err != nil {
-                v1.SendError(ctx, http.StatusUnprocessableEntity, errors.New("Malformed login payload"))
+                message := api.Validator.Login(err)
+                v1.SendError(ctx, http.StatusUnprocessableEntity, errors.New(message))
                 return
         }
 
@@ -110,4 +114,20 @@ func (api *V1AuthAPI) Login(ctx *gin.Context) {
                 return
         }
         ctx.JSON(http.StatusOK, tokens)
+}
+
+func (api *V1AuthAPI) Logout(ctx *gin.Context) {
+        accessMeta, err := api.AuthService.ExtractAccessMeta(ctx.Request)
+        if err != nil {
+                v1.SendError(ctx, http.StatusBadRequest, errors.New("User not logged in"))
+                return
+        }
+
+        nDeleted, err := api.AuthService.DeleteAuth(accessMeta.AccessUUID.String())
+        if err != nil || nDeleted == 0 {
+                v1.SendError(ctx, http.StatusUnauthorized, errors.New("Invalid request"))
+                return
+        }
+
+        ctx.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }

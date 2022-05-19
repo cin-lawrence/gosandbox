@@ -1,16 +1,19 @@
 package v1
 
 import (
+        "errors"
 	"net/http"
 
 	"github.com/cin-lawrence/gosandbox/pkg/api/error"
 	"github.com/cin-lawrence/gosandbox/pkg/models"
 	"github.com/cin-lawrence/gosandbox/pkg/services"
+	"github.com/cin-lawrence/gosandbox/pkg/validator"
 	"github.com/gin-gonic/gin"
 )
 
 type V1UserAPI struct {
 	UserService services.UserService
+        Validator *validator.UserValidator
 }
 
 var v1UserAPI *V1UserAPI
@@ -18,9 +21,11 @@ var v1UserAPI *V1UserAPI
 func NewV1UserGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 	v1UserAPI = &V1UserAPI{
 		UserService: *services.NewUserService(),
+                Validator: new(validator.UserValidator),
 	}
 
-	v1UserGroup := rg.Group("/users", Authorize())
+	// v1UserGroup := rg.Group("/users", Authorize())
+	v1UserGroup := rg.Group("/users")
 	v1UserGroup.GET("/", v1UserAPI.ListUsers)
 	v1UserGroup.POST("/", v1UserAPI.CreateUser)
 	v1UserGroup.GET("/:id", v1UserAPI.GetUser)
@@ -42,7 +47,8 @@ func (api *V1UserAPI) ListUsers(ctx *gin.Context) {
 func (api *V1UserAPI) CreateUser(ctx *gin.Context) {
 	var userInput models.UserInput
 	if err := ctx.ShouldBind(&userInput); err != nil {
-		v1.SendError(ctx, http.StatusUnprocessableEntity, err)
+                message := api.Validator.CreateUser(err)
+		v1.SendError(ctx, http.StatusUnprocessableEntity, errors.New(message))
 		return
 	}
 
