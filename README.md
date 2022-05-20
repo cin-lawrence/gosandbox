@@ -39,3 +39,6 @@ curl --location --request POST 'http://localhost:8080/api/v1/jobs/' \
 
 ## Known issues
 - The 2nd job is held by `gocelery` due to some misconfiguration. It might take a long time to investigate.
+
+## References
+- [Gin Examples](https://github.com/gin-gonic/examples)
