@@ -5,29 +5,29 @@ import (
 )
 
 type RefreshTokenInput struct {
-        RefreshToken string `form:"refresh_token" json:"refresh_token" binding:"required"`
+	RefreshToken string `form:"refresh_token" json:"refresh_token" binding:"required"`
 }
 
 type Tokens struct {
-        AccessToken string `json:"access_token"`
-        RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type UserLogin struct {
-        Email string `form:"email" json:"email" binding:"required,email"`
-        Password string `form:"password" json:"password" binding:"required,min=3,max=50"`
+	Username    string `form:"username" json:"username" binding:"required,email"`
+	Password string `form:"password" json:"password" binding:"required,min=3,max=50"`
 }
 
 type TokenMeta struct {
-        AccessToken string
-        RefreshToken string
-        AccessUUID uuid.UUID
-        RefreshUUID uuid.UUID
-        AccessExpires int64
-        RefreshExpires int64
+	AccessToken    string
+	RefreshToken   string
+	AccessUUID     uuid.UUID
+	RefreshUUID    uuid.UUID
+	AccessExpires  int64
+	RefreshExpires int64
 }
 
 type AccessMeta struct {
-        AccessUUID uuid.UUID
-        UserID int64
+	AccessUUID uuid.UUID
+	UserID     int64
 }

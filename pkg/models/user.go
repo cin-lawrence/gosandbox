@@ -13,7 +13,11 @@ type UserList struct {
 }
 
 type UserInput struct {
-        Name  string `form:"name" json:"name" binding:"required"`
-        Email string `form:"email" json:"email" binding:"required,email"`
-        Password string `form:"password" json:"password" binding:"required,min=3,max=50"`
+	Name     string `form:"name" json:"name" binding:"required"`
+	Email    string `form:"email" json:"email" binding:"required,email"`
+	Password string `form:"password" json:"password" binding:"required,min=3,max=50"`
+}
+
+type UserUpdate struct {
+	Name     string `form:"name" json:"name" binding:"required"`
 }

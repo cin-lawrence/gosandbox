@@ -33,10 +33,15 @@ type Job struct {
 	BaseModel
 	Status JobStatus      `json:"status" sql:"type:job_status"`
 	Result datatypes.JSON `json:"result"`
-	UserID uint           `json:"user_id" binding:"required"`
+	UserID uint           `json:"-"`
 	User   *User          `json:"user"`
 }
 
 type JobList struct {
 	Items []Job `json:"items"`
+}
+
+type JobCreate struct {
+	Status JobStatus      `json:"status" sql:"type:job_status"`
+	UserID uint           `json:"user_id" binding:"required"`
 }
