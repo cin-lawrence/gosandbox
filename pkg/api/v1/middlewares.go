@@ -1,11 +1,11 @@
 package v1
 
 import (
-        "errors"
+	"errors"
 	"net/http"
 
-        "github.com/cin-lawrence/gosandbox/pkg/api/error"
-        "github.com/cin-lawrence/gosandbox/pkg/services"
+	"github.com/cin-lawrence/gosandbox/pkg/api/error"
+	"github.com/cin-lawrence/gosandbox/pkg/services"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -13,28 +13,26 @@ import (
 
 var authService *services.AuthService = services.NewAuthService()
 
-
 func ValidateToken(ctx *gin.Context) {
-        am, err := authService.ExtractAccessMeta(ctx.Request)
-        if err != nil {
-                v1.SendError(ctx, http.StatusUnauthorized, errors.New("Invalid access token"))
-                return
-        }
+	am, err := authService.ExtractAccessMeta(ctx.Request)
+	if err != nil {
+		v1.SendError(ctx, http.StatusUnauthorized, errors.New("Invalid access token"))
+		return
+	}
 
-        userID, err := authService.FetchAuth(am)
-        if err != nil {
-                v1.SendError(ctx, http.StatusUnauthorized, errors.New("Can't fetch auth"))
-                return
-        }
-        ctx.Set("userID", userID)
+	userID, err := authService.FetchAuth(am)
+	if err != nil {
+		v1.SendError(ctx, http.StatusUnauthorized, errors.New("Can't fetch auth"))
+		return
+	}
+	ctx.Set("userID", userID)
 }
 
-
 func Authorize() gin.HandlerFunc {
-        return func(ctx *gin.Context) {
-                ValidateToken(ctx)
-                ctx.Next()
-        }
+	return func(ctx *gin.Context) {
+		ValidateToken(ctx)
+		ctx.Next()
+	}
 
 }
 
@@ -56,9 +54,9 @@ func CORS() gin.HandlerFunc {
 }
 
 func GenerateRequestID() gin.HandlerFunc {
-        return func(ctx *gin.Context) {
-                requestID := uuid.Must(uuid.NewV4())
-                ctx.Writer.Header().Set("X-Request-Id", requestID.String())
-                ctx.Next()
-        }
+	return func(ctx *gin.Context) {
+		requestID := uuid.Must(uuid.NewV4())
+		ctx.Writer.Header().Set("X-Request-Id", requestID.String())
+		ctx.Next()
+	}
 }

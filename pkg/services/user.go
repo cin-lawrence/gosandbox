@@ -1,7 +1,7 @@
 package services
 
 import (
-        "errors"
+	"errors"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -35,17 +35,17 @@ func (srv *UserService) List() (users []models.User, err error) {
 
 func (srv *UserService) Create(userInput models.UserInput) (user models.User, err error) {
 	session := srv.newSession()
-        bytePassword := []byte(userInput.Password)
-        hashedPassword, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
-        if err != nil {
-                return user, errors.New("Can't generate hashed password")
-        }
-        user = models.User{
-                Name: userInput.Name,
-                Email: userInput.Email,
-                HashedPassword: string(hashedPassword),
-                IsActive: true,
-        }
+	bytePassword := []byte(userInput.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
+	if err != nil {
+		return user, errors.New("Can't generate hashed password")
+	}
+	user = models.User{
+		Name:           userInput.Name,
+		Email:          userInput.Email,
+		HashedPassword: string(hashedPassword),
+		IsActive:       true,
+	}
 
 	result := session.Create(&user)
 	if result.Error != nil {
@@ -66,7 +66,7 @@ func (srv *UserService) Get(id string) (user models.User, err error) {
 	return user, nil
 }
 
-func (srv *UserService) Update(id string, userIn models.User) (user models.User, err error) {
+func (srv *UserService) Update(id string, userIn models.UserUpdate) (user models.User, err error) {
 	user, err = srv.Get(id)
 	if err != nil {
 		log.Errorf("User %s not found: %v", id, err)
@@ -76,7 +76,7 @@ func (srv *UserService) Update(id string, userIn models.User) (user models.User,
 	result := session.Model(&user).Updates(userIn)
 	if result.Error != nil {
 		log.Errorf("Update user % failed: %v", id, result.Error)
-		return models.User{}, result.Error
+		return user, result.Error
 	}
 	return user, nil
 }
@@ -97,10 +97,10 @@ func (srv *UserService) Delete(id string) error {
 }
 
 func (srv *UserService) GetByEmail(email string) (user models.User, err error) {
-        session := srv.newSession()
-        res := session.Model(models.User{Email: email}).First(&user)
-        if res.Error != nil {
-                return user, res.Error
-        }
-        return user, nil
+	session := srv.newSession()
+	res := session.Model(models.User{Email: email}).First(&user)
+	if res.Error != nil {
+		return user, res.Error
+	}
+	return user, nil
 }
