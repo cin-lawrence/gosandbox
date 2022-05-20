@@ -41,7 +41,7 @@ func (v *DefaultValidator) lazyinit() {
 		v.validate.SetTagName("binding")
 
 		// add any custom validations etc. here
-                // v.validate.RegisterValidation("fullName", ValidateFullName)
+		// v.validate.RegisterValidation("fullName", ValidateFullName)
 	})
 }
 
