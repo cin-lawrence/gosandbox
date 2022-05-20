@@ -31,16 +31,20 @@ func (srv *JobService) List() ([]models.Job, error) {
 	return models, nil
 }
 
-func (srv *JobService) Create(model models.Job) (models.Job, error) {
+func (srv *JobService) Create(jobIn models.JobCreate) (job models.Job, err error) {
 	session := srv.newSession()
-	result := session.Create(&model)
+	job = models.Job{
+		Status: models.JobStatusPending,
+		UserID: jobIn.UserID,
+	}
+	result := session.Create(&job)
 	if result.Error != nil {
 		log.Errorf("Create job failed: %v", result.Error)
 		return models.Job{}, result.Error
 	}
 
-	session.First(&model, model.ID)
-	return model, nil
+	session.First(&job, job.ID)
+	return job, nil
 }
 
 func (srv *JobService) Get(id string) (models.Job, error) {
