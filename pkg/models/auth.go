@@ -14,7 +14,7 @@ type Tokens struct {
 }
 
 type UserLogin struct {
-	Username    string `form:"username" json:"username" binding:"required,email"`
+	Username string `form:"username" json:"username" binding:"required,email"`
 	Password string `form:"password" json:"password" binding:"required,min=3,max=50"`
 }
 

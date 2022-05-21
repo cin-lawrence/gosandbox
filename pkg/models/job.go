@@ -42,6 +42,6 @@ type JobList struct {
 }
 
 type JobCreate struct {
-	Status JobStatus      `json:"status" sql:"type:job_status"`
-	UserID uint           `json:"user_id" binding:"required"`
+	Status JobStatus `json:"status" sql:"type:job_status"`
+	UserID uint      `json:"user_id" binding:"required"`
 }

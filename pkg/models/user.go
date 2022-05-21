@@ -19,5 +19,5 @@ type UserInput struct {
 }
 
 type UserUpdate struct {
-	Name     string `form:"name" json:"name" binding:"required"`
+	Name string `form:"name" json:"name" binding:"required"`
 }
