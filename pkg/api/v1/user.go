@@ -24,8 +24,7 @@ func NewV1UserGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 		Validator:   new(validator.UserValidator),
 	}
 
-	// v1UserGroup := rg.Group("/users", Authorize())
-	v1UserGroup := rg.Group("/users")
+	v1UserGroup := rg.Group("/users", Authorize())
 	v1UserGroup.GET("/", v1UserAPI.ListUsers)
 	v1UserGroup.POST("/", v1UserAPI.CreateUser)
 	v1UserGroup.GET("/:id", v1UserAPI.GetUser)
@@ -132,7 +131,7 @@ func (api *V1UserAPI) UpdateUser(ctx *gin.Context) {
 // @Tags	users
 // @Produce	json
 // @Param	id	path integer true "User ID"
-// @Success	200	{object} models.User
+// @Success	204	{object} models.User
 // @Failure	404	{object} error.APIError
 // @Router	/api/v1/users/{id} [delete]
 // @Security    OAuth2Password
@@ -145,5 +144,5 @@ func (api *V1UserAPI) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
