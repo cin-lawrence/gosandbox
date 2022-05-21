@@ -18,6 +18,8 @@ func ConnectToDatabase() *gorm.DB {
 	switch {
 	case strings.HasPrefix(config.Config.DatabaseURI, "postgresql://"):
 		dbConn, err = ConnectToPostgres(config.Config.DatabaseURI)
+	case strings.HasPrefix(config.Config.DatabaseURI, "sqlite://"):
+		dbConn, err = ConnectToSqlite(config.Config.DatabaseURI)
 	default:
 		err = errors.New("Unsupported DB URI")
 	}
