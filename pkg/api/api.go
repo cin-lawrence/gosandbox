@@ -6,6 +6,7 @@ import (
 
 	"github.com/cin-lawrence/gosandbox/docs"
 	v1 "github.com/cin-lawrence/gosandbox/pkg/api/v1"
+	"github.com/cin-lawrence/gosandbox/pkg/config"
 	"github.com/cin-lawrence/gosandbox/pkg/db"
 	"github.com/cin-lawrence/gosandbox/pkg/validator"
 
@@ -23,6 +24,9 @@ type APIServer struct {
 }
 
 func NewAPIServer() APIServer {
+	if !config.Config.Dev {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.Default()
 	binding.Validator = new(validator.DefaultValidator)
 	router.Use(v1.CORS())
