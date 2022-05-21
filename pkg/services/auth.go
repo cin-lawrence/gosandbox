@@ -28,11 +28,18 @@ func NewAuthService() *AuthService {
 	return srv
 }
 
-func (srv *AuthService) GetSecretIfValid(token *jwt.Token) (interface{}, error) {
+func (srv *AuthService) GetAccessTokenSecret(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	}
 	return []byte(config.Config.AccessTokenSecret), nil
+}
+
+func (srv *AuthService) GetRefreshTokenSecret(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+	return []byte(config.Config.RefreshTokenSecret), nil
 }
 
 func (srv *AuthService) CreateToken(userID uint) (*models.TokenMeta, error) {
@@ -78,7 +85,7 @@ func (srv *AuthService) ExtractToken(r *http.Request) string {
 
 func (srv *AuthService) VerifyToken(r *http.Request) (*jwt.Token, error) {
 	tokenString := srv.ExtractToken(r)
-	token, err := jwt.Parse(tokenString, srv.GetSecretIfValid)
+	token, err := jwt.Parse(tokenString, srv.GetAccessTokenSecret)
 	if err != nil {
 		return nil, err
 	}
