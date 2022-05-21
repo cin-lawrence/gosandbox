@@ -57,7 +57,7 @@ func (api *V1AuthAPI) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := jwt.Parse(refreshTokenInput.RefreshToken, api.AuthService.GetSecretIfValid)
+	token, err := jwt.Parse(refreshTokenInput.RefreshToken, api.AuthService.GetRefreshTokenSecret)
 	if err != nil {
 		v1.SendError(ctx, http.StatusUnauthorized, errors.New("Invalid authorization, please login again"))
 		return
@@ -124,7 +124,8 @@ func (api *V1AuthAPI) Login(ctx *gin.Context) {
 	if err := ctx.ShouldBind(&userLogin); err != nil {
 		message := api.Validator.Login(err)
 		v1.SendError(ctx, http.StatusUnprocessableEntity, errors.New(message))
-		return }
+		return
+	}
 	user, err := api.UserService.GetByEmail(userLogin.Username)
 	if err != nil {
 		v1.SendError(ctx, http.StatusNotFound, fmt.Errorf("User %s does not exist", userLogin.Username))
