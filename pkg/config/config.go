@@ -1,10 +1,16 @@
 package config
 
 import (
+	"path/filepath"
+	"runtime"
+
 	"github.com/spf13/viper"
 )
 
 type config struct {
+	Dev  bool `mapstructure:"DEV"`
+	Test bool `mapstructure:"TEST"`
+
 	BrokerURI   string `mapstructure:"BROKER_URI"`
 	DatabaseURI string `mapstructure:"DATABASE_URI"`
 	Port        int    `mapstructure:"PORT"`
@@ -24,6 +30,8 @@ type config struct {
 var Config config = LoadConfig()
 
 func setDefaults(v *viper.Viper) {
+	v.SetDefault("DEV", false)
+	v.SetDefault("TEST", false)
 	v.SetDefault("ACCESS_TOKEN_EXPIRATION_TIME", 15*60)
 	v.SetDefault("REFRESH_TOKEN_EXPIRATION_TIME", 7*24*60*60)
 	v.SetDefault("ACCESS_TOKEN_SECRET", "paragona")
@@ -32,8 +40,13 @@ func setDefaults(v *viper.Viper) {
 }
 
 func newViper() *viper.Viper {
+	_, path, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("Can't get caller information")
+	}
 	v := viper.New()
 	v.AddConfigPath("./configs/api")
+	v.AddConfigPath(filepath.Join(path, "../../../configs/test"))
 	v.SetConfigName(".env")
 	v.SetConfigType("env")
 	v.AutomaticEnv()
