@@ -1,16 +1,33 @@
 package main
 
 import (
-	"os"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/cin-lawrence/gosandbox/pkg/api"
+	"github.com/cin-lawrence/gosandbox/pkg/models"
+	"github.com/cin-lawrence/gosandbox/pkg/services"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
+func init() {
+	srv := services.NewUserService()
+
+	_, err := srv.GetByEmail("surge@paragon.com")
+	if err == nil {
+		log.Infof("First user exists, skip creating...")
+		return
 	}
-	return fallback
+
+	userIn := models.UserInput{
+		Name:  "Surge",
+		Email: "surge@paragon.com",
+		Password: "paragon",
+	}
+
+	user, err := srv.Create(userIn)
+	if err != nil {
+		panic(err)
+	}
+	log.Infof("Seeded the first user %s (%s)", user.Name, user.Email)
 }
 
 // @title           Ninja REST API
