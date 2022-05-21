@@ -1,7 +1,10 @@
-.PHONY: swagger up down fmt test cover
+.PHONY: swagger build up down fmt test cover
 
 swagger:
 	@$(CURDIR)/scripts/gen-swagger.sh
+
+build:
+	@docker-compose build
 
 up:
 	@docker-compose up -d
