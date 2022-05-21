@@ -67,7 +67,7 @@ func (srv *JobService) Update(id string, model models.Job) (models.Job, error) {
 	session := srv.newSession()
 	result := session.Model(&modelInDB).Updates(model)
 	if result.Error != nil {
-		log.Errorf("Update job % failed: %v", id, result.Error)
+		log.Errorf("Update job %s failed: %v", id, result.Error)
 		return models.Job{}, result.Error
 	}
 	return modelInDB, nil

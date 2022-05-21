@@ -75,7 +75,7 @@ func (srv *UserService) Update(id string, userIn models.UserUpdate) (user models
 	session := srv.newSession()
 	result := session.Model(&user).Updates(userIn)
 	if result.Error != nil {
-		log.Errorf("Update user % failed: %v", id, result.Error)
+		log.Errorf("Update user %s failed: %v", id, result.Error)
 		return user, result.Error
 	}
 	return user, nil
