@@ -37,6 +37,9 @@ curl --location --request POST 'http://localhost:8080/api/v1/jobs/' \
 ```
 or creates a new user.
 
+## Swagger documentation
+Upon spinning up the project, navigate to `localhost:8080/docs`.
+
 ## Testing
 ```
 make test
