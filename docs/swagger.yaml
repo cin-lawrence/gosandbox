@@ -1,0 +1,436 @@
+basePath: /api/v1
+definitions:
+  models.Job:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      result:
+        items:
+          type: integer
+        type: array
+      status:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.JobCreate:
+    properties:
+      status:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - user_id
+    type: object
+  models.JobList:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.Job'
+        type: array
+    type: object
+  models.RefreshTokenInput:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  models.Tokens:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.UserList:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.UserUpdate:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  v1.APIError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: lawrence@cinnamon.is
+    name: Lawrence @ Cinnamon AI
+    url: https://github.com/cin-lawrence
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Ninja REST API
+  version: "1.0"
+paths:
+  /api/v1/auth/login/:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        maxLength: 50
+        minLength: 3
+        name: password
+        required: true
+        type: string
+      - in: formData
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tokens'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      summary: Log in
+      tags:
+      - auth
+  /api/v1/auth/logout/:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      summary: Log out
+      tags:
+      - auth
+  /api/v1/auth/refresh/:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshTokenInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tokens'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      summary: Refresh an access token
+      tags:
+      - auth
+  /api/v1/jobs/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JobList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: List all jobs
+      tags:
+      - jobs
+    post:
+      consumes:
+      - application/json
+      description: Create a simple Celery task that does a random fibonacci calculation.
+      parameters:
+      - description: Job meta
+        in: body
+        name: meta
+        required: true
+        schema:
+          $ref: '#/definitions/models.JobCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Job'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Create a new job
+      tags:
+      - jobs
+  /api/v1/jobs/{id}:
+    delete:
+      parameters:
+      - description: jobs ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Job'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Delete a job
+      tags:
+      - jobs
+    get:
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Job'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Retrieve a job
+      tags:
+      - jobs
+  /api/v1/users/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: email
+        required: true
+        type: string
+      - in: formData
+        name: name
+        required: true
+        type: string
+      - in: formData
+        maxLength: 50
+        minLength: 3
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Create a new user
+      tags:
+      - users
+  /api/v1/users/{id}:
+    delete:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Retrieve a user information
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User information
+        in: body
+        name: info
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.APIError'
+      security:
+      - OAuth2Password: []
+      summary: Update a user
+      tags:
+      - users
+securityDefinitions:
+  OAuth2Password:
+    flow: password
+    tokenUrl: /api/v1/auth/login
+    type: oauth2
+swagger: "2.0"

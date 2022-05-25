@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: ./build/api/Dockerfile.dev
+      dockerfile: ./build/api/Dockerfile
     container_name: api
     env_file:
       - ./configs/api/.env
@@ -17,7 +17,6 @@ services:
       - queue
       - redis
 
-    # wkrgo:
   wkrce:
     build:
       context: .

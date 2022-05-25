@@ -23,14 +23,6 @@ type V1JobAPI struct {
 	WorkerClient *gc.CeleryClient
 }
 
-type JobList struct {
-	Items []models.Job `json:"items"`
-}
-
-type JobInput struct {
-	UserID uint `json:"user_id" binding:"required"`
-}
-
 var v1JobAPI *V1JobAPI
 
 func NewV1JobGroup(rg *gin.RouterGroup) *gin.RouterGroup {
@@ -40,41 +32,60 @@ func NewV1JobGroup(rg *gin.RouterGroup) *gin.RouterGroup {
 		WorkerClient: worker.NewWorkerClient(),
 	}
 
-	v1JobGroup := rg.Group("/jobs")
+	v1JobGroup := rg.Group("/jobs", Authorize())
 	v1JobGroup.GET("/", v1JobAPI.ListJobs)
 	v1JobGroup.POST("/", v1JobAPI.CreateJob)
 	v1JobGroup.GET("/:id", v1JobAPI.GetJob)
-	v1JobGroup.PUT("/:id", v1JobAPI.UpdateJob)
 	v1JobGroup.DELETE("/:id", v1JobAPI.DeleteJob)
 	return v1JobGroup
 }
 
+// ListJobs godoc
+// @Summary	List all jobs
+// @Tags	jobs
+// @Produce	json
+// @Success	200	{object} models.JobList
+// @Failure	500	{object} error.APIError
+// @Router	/api/v1/jobs/ [get]
+// @Security    OAuth2Password
 func (api *V1JobAPI) ListJobs(ctx *gin.Context) {
 	jobs, err := api.JobService.List()
 	if err != nil {
 		v1.SendError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, JobList{Items: jobs})
+	ctx.JSON(http.StatusOK, models.JobList{Items: jobs})
 }
 
+// CreateUsers godoc
+// @Summary	Create a new job
+// @Description Create a simple Celery task that does a random fibonacci calculation.
+// @Tags	jobs
+// @Accept	json
+// @Produce	json
+// @Param	meta	body models.JobCreate true "Job meta"
+// @Success	201	{object} models.Job
+// @Failure	404	{object} error.APIError
+// @Failure	422	{object} error.APIError
+// @Failure	500	{object} error.APIError
+// @Router	/api/v1/jobs/ [post]
+// @Security    OAuth2Password
 func (api *V1JobAPI) CreateJob(ctx *gin.Context) {
-	var job models.Job
-	if err := ctx.ShouldBindJSON(&job); err != nil {
-		v1.SendError(ctx, http.StatusBadRequest, err)
+	var jobIn models.JobCreate
+	if err := ctx.ShouldBindJSON(&jobIn); err != nil {
+		v1.SendError(ctx, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	_, err := api.UserService.Get(
-		strconv.FormatUint(uint64(job.UserID), 10),
+		strconv.FormatUint(uint64(jobIn.UserID), 10),
 	)
 	if err != nil {
 		v1.SendError(ctx, http.StatusNotFound, err)
 		return
 	}
 
-	job.Status = models.JobStatusPending
-	job, err = api.JobService.Create(job)
+	job, err := api.JobService.Create(jobIn)
 	if err != nil {
 		v1.SendError(ctx, http.StatusInternalServerError, err)
 	}
@@ -94,6 +105,15 @@ func (api *V1JobAPI) CreateJob(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, job)
 }
 
+// GetJob godoc
+// @Summary	Retrieve a job
+// @Tags	jobs
+// @Produce	json
+// @Param	id	path integer true "Job ID"
+// @Success	200	{object} models.Job
+// @Failure	404	{object} error.APIError
+// @Router	/api/v1/jobs/{id} [get]
+// @Security    OAuth2Password
 func (api *V1JobAPI) GetJob(ctx *gin.Context) {
 	id := ctx.Param("id")
 	job, err := api.JobService.Get(id)
@@ -105,22 +125,15 @@ func (api *V1JobAPI) GetJob(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, job)
 }
 
-func (api *V1JobAPI) UpdateJob(ctx *gin.Context) {
-	id := ctx.Param("id")
-	var job models.Job
-	if err := ctx.ShouldBindJSON(&job); err != nil {
-		v1.SendError(ctx, http.StatusNotFound, err)
-		return
-	}
-
-	job, err := api.JobService.Update(id, job)
-	if err != nil {
-		v1.SendError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-	ctx.JSON(http.StatusOK, job)
-}
-
+// DeleteJob godoc
+// @Summary	Delete a job
+// @Tags	jobs
+// @Produce	json
+// @Param	id	path integer true "jobs ID"
+// @Success	200	{object} models.Job
+// @Failure	404	{object} error.APIError
+// @Router	/api/v1/jobs/{id} [delete]
+// @Security	OAuth2Password
 func (api *V1JobAPI) DeleteJob(ctx *gin.Context) {
 	id := ctx.Param("id")
 

@@ -10,6 +10,9 @@ import (
 )
 
 func NewWorkerClient() *gc.CeleryClient {
+	if config.Config.Test {
+		return nil
+	}
 	numAttempts := 0
 	for {
 		client, err := gc.NewCeleryClient(
