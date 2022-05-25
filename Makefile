@@ -1,4 +1,4 @@
-.PHONY: swagger build up down fmt test cover
+.PHONY: swagger build up down fmt test cover clean
 
 swagger:
 	@$(CURDIR)/scripts/gen-swagger.sh
@@ -21,3 +21,5 @@ test:
 cover:
 	@go test -cover -coverprofile=c.out ./...
 	@go tool cover -html=c.out -o coverage.html
+
+all: build up

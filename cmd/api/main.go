@@ -18,8 +18,8 @@ func init() {
 	}
 
 	userIn := models.UserInput{
-		Name:  "Surge",
-		Email: "surge@paragon.com",
+		Name:     "Surge",
+		Email:    "surge@paragon.com",
 		Password: "paragon",
 	}
 
